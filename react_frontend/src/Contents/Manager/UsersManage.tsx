@@ -75,7 +75,7 @@ const Lists = styled.ul`
 
 function UsersManage() {
     const { data, isLoading } = useQuery<IuUserInfo[]>("users", getUsersInfoManage,  {
-        refetchInterval: 3000,
+        refetchInterval: 5000,
     })
     
     return (
@@ -104,8 +104,8 @@ function UsersManage() {
                                 <span>{user.username}</span> 
                                 <span>{user.is_login?"로그인중":""}</span> 
                                 <span>{user.is_login?user.login_ip:""}</span> 
-                                <span>{user.login_datetime.slice(11,19)}</span> 
-                                <span>{user.logout_datetime.slice(11,19)}</span> 
+                                <span>{user.login_datetime ? user.login_datetime.slice(11,19) : ""}</span> 
+                                <span>{user.logout_datetime ? user.logout_datetime.slice(11,19) : ""}</span> 
                             </Lists>  
                         )) }
                     </Infolist>

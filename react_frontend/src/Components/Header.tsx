@@ -81,9 +81,21 @@ function Header() {
         ChackLoggedIn()       
     },[islogin])
 
+    useEffect(()=>{
+        document.addEventListener('visibilitychange',handleVisibilityChange );
+        return () =>{
+            document.addEventListener('visibilitychange',handleVisibilityChange );
+        }
+    })
+
     useInterval(() => {   
         ChackLoggedIn()
     },3000);   
+
+    const handleVisibilityChange = () => {
+        console.log("바뀜!!!!")
+        console.log(document.hidden)
+    }
 
     const ChackLoggedIn = () =>{
          // console.log(islogin, ckflg)
