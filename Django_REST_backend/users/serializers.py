@@ -5,6 +5,7 @@ from .models import User as User_madels
 class UserSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(write_only=True)
+    is_hidden = serializers.BooleanField(write_only=True)
 
     class Meta:
         model = User_madels
@@ -18,6 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
             "login_datetime",
             "logout_datetime",
             "is_login",
+            "is_hidden",
         )
         read_only_fields = ("id",)
 

@@ -22,9 +22,9 @@ class IsSelf(BasePermission):
         siri_user = cash_get_user(username)
         if siri_user is None:
             siri_user = get_Serialiser_user_data_pk(request.user.pk)
-            print("IsSelf 호출", siri_user, login_ip)
-        else:
-            print("IsSelf 호출(캐시)", siri_user, login_ip)
+        #     print("IsSelf 호출", siri_user, login_ip)
+        # else:
+        #     print("IsSelf 호출(캐시)", siri_user, login_ip)
 
         if siri_user is None:
             print("로그인까지 한 상태일텐데..유저가 없다??")
@@ -64,12 +64,12 @@ class IsManager(BasePermission):
         siri_user = cash_get_user(username)
         if siri_user is None:
             siri_user = get_Serialiser_user_data_pk(request.user.pk)
-            print("IsManager 호출", siri_user, login_ip)
-        else:
-            print("IsManager 호출(캐시)", siri_user, login_ip)
+        #     print("IsManager 호출", siri_user, login_ip)
+        # else:
+        #     print("IsManager 호출(캐시)", siri_user, login_ip)
 
         if siri_user is None:
-            print("로그인까지 한 상태일텐데..유저가 없다??")
+            print("로그인까지 한 상태일텐데..유저가 없다??(매니저)")
             return False
 
         if not request.user.username == siri_user.get("username"):

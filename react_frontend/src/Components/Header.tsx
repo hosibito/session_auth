@@ -2,7 +2,7 @@ import {  useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
-import { getUserInfo, Logout } from '../actions/auth';
+import { getUserInfo, Logout, setUserHidden } from '../actions/auth';
 import useInterval from '../actions/customHook';
 import { isLogin, userProfile } from '../atoms/loginState';
 
@@ -74,51 +74,38 @@ const Info = styled.div`
 function Header() {  
     const navigate = useNavigate()
     const [ islogin, setisLogin] = useRecoilState(isLogin)
-    const [ userprofile , setuserprofile ] = useRecoilState(userProfile)  
-    const [ ckflg, setckflg] = useState(false)
+    const [ userprofile , setuserprofile ] = useRecoilState(userProfile)   
+    const [is_hidden, set_is_hidden] = useState(false)
     
+    // 로그인 처리( 로그인 중에는 유저데이터 정기적으로 가져옴 )
+    let is_login_flg = false
     useEffect(() => {        
-        ChackLoggedIn()       
-    },[islogin])
-
-    useEffect(()=>{
-        document.addEventListener('visibilitychange',handleVisibilityChange );
-        return () =>{
-            document.addEventListener('visibilitychange',handleVisibilityChange );
-        }
-    })
-
-    useInterval(() => {   
-        ChackLoggedIn()
-    },3000);   
-
-    const handleVisibilityChange = () => {
-        console.log("바뀜!!!!")
-        console.log(document.hidden)
-    }
-
-    const ChackLoggedIn = () =>{
-         // console.log(islogin, ckflg)
-         if(islogin){
-            setckflg(true)
+        if(islogin){
+            is_login_flg=true
             GetLogInData()          
         }else{
-            if(ckflg){
+            if(is_login_flg){
                 GetLogInData()
-                setckflg(false)
+                is_login_flg=false
                 navigate("/login")
             }
+        }       
+    },[islogin, is_hidden])
+      
+    useInterval(() => { 
+        if (islogin && !is_hidden)  {
+            GetLogInData()  
         }
-    }
-
+    },3000);   
+    
     const GetLogInData = async() => {
         const res = await getUserInfo()  
         // console.log(res.detail) 
-        if(res.detail === "자격 인증데이터(authentication credentials)가 제공되지 않았습니다."){
-            // console.log(res.error , islogin)  
+        console.log("ㅁㅁㅁㅁ", res.detail , islogin)  
+        if(res.detail){
             if(isLogin){
                 setisLogin(false)
-                setckflg(false)                             
+                is_login_flg=false                          
             }
         } else {        
             // console.log(res.username , islogin, !islogin)  
@@ -132,14 +119,51 @@ function Header() {
                 })
             }
         }
-        console.log("GetLogInData 처리 :" , res.username , islogin, ckflg , userprofile.username)  
+        console.log("GetLogInData 처리 :" , res.username , islogin, is_login_flg , userprofile.username)  
+    }
+    
+
+    // 탭 전환 처리
+    useEffect(()=>{
+        document.addEventListener('visibilitychange',handleVisibilityChange );       
+        return () =>{
+            document.addEventListener('visibilitychange',handleVisibilityChange );
+        }
+    })   
+
+    const handleVisibilityChange = () => {    
+        set_is_hidden(document.hidden)                  
     }
 
+    useEffect(()=>{ 
+        if(islogin){
+            setUserHidden(is_hidden)  
+        }
+    },[is_hidden])   
+
+
+    //로그아웃 처리(둘다할필요는 없지만 확실하게 로그아웃해야해서..)
+    useEffect(()=>{
+        window.addEventListener('beforeunload', OnLogout);
+        return () => {
+            window.removeEventListener('beforeunload', OnLogout)
+        };
+    })
+
+    useEffect(()=>{
+        window.addEventListener('unload', OnLogout);
+        return () => {
+            window.removeEventListener('unload', OnLogout)
+        };
+    })
+
     const OnLogout = async() => {
-        const logoutRes = await Logout()
-        console.log(logoutRes) 
-        setisLogin(false)  
-    }      
+        if (islogin){
+            const logoutRes = await Logout()
+            console.log(logoutRes) 
+            setisLogin(false)  
+        }
+    }    
 
     return (
         <Conteiner> 

@@ -29,13 +29,17 @@ class User(AbstractUser):
         choices=AUTHORITY_CHOICES,
         default=AUTHORITY_User,
     )
-    login_verified = models.BooleanField(default=False)
     login_ip = models.CharField(max_length=20, default="", blank=True)
     login_datetime = models.DateTimeField(blank=True, null=True)
     logout_datetime = models.DateTimeField(blank=True, null=True)
+    login_verified = models.BooleanField(default=False)
+    is_hidden = models.BooleanField(default=False)
 
     def is_login(self):
-        return bool(cache.get(self.username))
+        if self.is_hidden:
+            return True
+        else:
+            return bool(cache.get(self.username))
 
     def __str__(self):
         return self.username
@@ -57,6 +61,7 @@ def kicked_my_other_sessions(sender, request, user, **kwargs):
         session_key = user_session.session_key
         session = SessionStore(session_key)
         session.delete()
+        user_session.delete()
 
     session_key = request.session.session_key
     UserSession.objects.create(user=user, session_key=session_key)

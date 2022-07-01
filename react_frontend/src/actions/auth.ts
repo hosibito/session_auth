@@ -78,7 +78,7 @@ export interface IuUserInfo{
 }
 
 // 일반유저 로그인 유저정보
-export function getUserInfo() {
+export function getUserInfo() {   
     return fetch('/api/session_auth_v1/users/user').then((response) => response.json())
 }
 
@@ -87,6 +87,19 @@ export function getUsersInfoManage() {
     return fetch('/api/session_auth_v1/users/users').then((response) => response.json())
 }
 
+
+// 일반유저 탭전환
+export function setUserHidden(data:boolean){    
+    return fetch("/api/session_auth_v1/users/user" , {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRFToken': Cookies.get('csrftoken') as string
+        },
+        body: JSON.stringify({ "is_hidden" : data })
+    }).then(reponse => reponse.json())
+}
 
 export function getCSRFtoken() {
     return axios.get(`/api/session_auth_v1/users/csrf_cookie`).then(function (response) {       

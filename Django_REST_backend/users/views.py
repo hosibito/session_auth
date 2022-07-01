@@ -1,3 +1,4 @@
+from functools import partial
 import time
 
 from django.utils import timezone
@@ -53,7 +54,7 @@ class UserView(APIView):
 
             reponse_data = cash_get_user(username)
             if reponse_data:
-                print(f"캐시데이터 반환!! : {reponse_data}")
+                # print(f"캐시데이터 반환!! : {reponse_data}")
                 return Response(reponse_data)
 
             user_pk = request.user.pk
@@ -65,6 +66,26 @@ class UserView(APIView):
             return Response(serializer.data)
         except Exception as e:
             print("UserView 에서 오류 발생 : ", e)
+            return Response({"error": "서버오류입니다. 관리자에게 문의하세요."})
+
+    def post(self, request):
+        """
+        { is_hidden }
+        """
+        try:
+            is_hidden = request.data.get("is_hidden")
+            user_pk = request.user.pk
+            print(request.user.username, "is_hiddne : ", is_hidden)
+            user = user_model.objects.get(pk=user_pk)
+            serializer = UserSerializer(user, data=request.data, partial=True)
+            if not serializer.is_valid():
+                return Response({"error": "요청이 거부되었습니다. 관리자에게 문의하세요."})
+
+            user = serializer.save()
+
+            return Response({"success": "상태를 변경했습니다. "})
+        except Exception as e:
+            print("UserView post 에서 오류 발생 : ", e)
             return Response({"error": "서버오류입니다. 관리자에게 문의하세요."})
 
 
@@ -93,6 +114,10 @@ class SignupView(APIView):
         re_password = request.data.get("re_password")
 
         try:
+            if not len(request.data) == 3:
+                print("유저가! 뭔가 제대로 딴짓을 햇다!!")
+                return Response({"error": "요청이 거부되었습니다. 관리자에게 문의하세요."})
+
             if not password == re_password:
                 return Response({"error": "비밀번호가 일치하지 않습니다."})
 
@@ -119,7 +144,7 @@ class LoginView(APIView):
     { "username":"","password":"" }
     """
 
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = [permissions.AllowAny]
 
     @method_decorator(csrf_protect)
     def post(self, request, format=None):
@@ -154,6 +179,7 @@ class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, format=None):
+        print("로그아웃 요청 들어옴")
         try:
             user = get_user_object_pk(request.user.pk)
             if user is None:
@@ -162,6 +188,7 @@ class LogoutView(APIView):
 
             # user.login_ip = ""
             user.logout_datetime = timezone.localtime()
+            user.is_hidden = False
             user.save()
             logout(request)
 
@@ -178,7 +205,7 @@ class LogoutView(APIView):
 
 
 class GetCSRFToken(APIView):
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = [permissions.AllowAny]
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request, format=None):

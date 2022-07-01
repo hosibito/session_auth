@@ -29,6 +29,7 @@ class UserAdmin(UserAdmin):
         "login_ip",
         "login_datetime",
         "is_login",
+        "is_hidden",
     )
 
 
