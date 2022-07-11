@@ -14,12 +14,12 @@ class UserSerializer(serializers.ModelSerializer):
             "username",
             "password",
             "authority",
-            "login_verified",
             "login_ip",
+            "is_hidden",
             "login_datetime",
             "logout_datetime",
-            "is_login",
-            "is_hidden",
+            "registration_approval",
+            "login_verified",
         )
         read_only_fields = ("id",)
 
@@ -32,7 +32,20 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-class UserViewSerializer(serializers.ModelSerializer):
+class UserMangerViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = User_madels
-        fields = ("id", "username")
+        fields = (
+            "id",
+            "username",
+            "password",
+            "authority",
+            "login_verified",
+            "login_ip",
+            "login_datetime",
+            "logout_datetime",
+            "is_login",
+            "is_hidden",
+            "registration_approval",
+            "login_verified",
+        )

@@ -27,15 +27,15 @@ class IsSelf(BasePermission):
         #     print("IsSelf 호출(캐시)", siri_user, login_ip)
 
         if siri_user is None:
-            print("로그인까지 한 상태일텐데..유저가 없다??")
+            print("IsSelf : 유저정보가 없어서 조회불가..")
             return False
 
         if not request.user.username == siri_user.get("username"):
-            print("리퀘스트 유저와 DB유저가 다름!!")
+            print("IsSelf : 리퀘스트 유저와 DB유저가 다름!!")
             return False
 
         if not siri_user.get("login_ip") == login_ip:
-            print("유저가 아이피가 로그인한 아이피가 아님!!")
+            print("IsSelf : 유저가 아이피가 로그인한 아이피가 아님!!")
             return False
 
         cash_set_user(username, siri_user)
@@ -69,19 +69,19 @@ class IsManager(BasePermission):
         #     print("IsManager 호출(캐시)", siri_user, login_ip)
 
         if siri_user is None:
-            print("로그인까지 한 상태일텐데..유저가 없다??(매니저)")
+            print("IsManager : 유저정보가 없어서 조회불가..")
             return False
 
         if not request.user.username == siri_user.get("username"):
-            print("리퀘스트 유저와 DB유저가 다름!!")
+            print("IsManager : 리퀘스트 유저와 DB유저가 다름!!")
             return False
 
         if not siri_user.get("login_ip") == login_ip:
-            print("유저가 아이피가 로그인한 아이피가 아님!!")
+            print("IsManager : 유저가 아이피가 로그인한 아이피가 아님!!")
             return False
 
         if not siri_user.get("authority") == "매니저":
-            print("유저가 매니저가 아닌데 들어온다고?!?!?")
+            print("IsManager : 유저가 매니저가 아닌데 들어온다고?!?!?")
             return False
 
         cash_set_user(username, siri_user)

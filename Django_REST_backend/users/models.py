@@ -29,6 +29,7 @@ class User(AbstractUser):
         choices=AUTHORITY_CHOICES,
         default=AUTHORITY_User,
     )
+    registration_approval = models.BooleanField(default=False)
     login_ip = models.CharField(max_length=20, default="", blank=True)
     login_datetime = models.DateTimeField(blank=True, null=True)
     logout_datetime = models.DateTimeField(blank=True, null=True)

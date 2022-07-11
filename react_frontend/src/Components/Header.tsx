@@ -2,7 +2,7 @@ import {  useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
-import { getUserInfo, Logout, setUserHidden } from '../actions/auth';
+import { getUserInfo, IuUserInfo, Logout, setUserHidden } from '../actions/auth';
 import useInterval from '../actions/customHook';
 import { isLogin, userProfile } from '../atoms/loginState';
 
@@ -75,8 +75,19 @@ function Header() {
     const navigate = useNavigate()
     const [ islogin, setisLogin] = useRecoilState(isLogin)
     const [ userprofile , setuserprofile ] = useRecoilState(userProfile)   
-    const [is_hidden, set_is_hidden] = useState(false)
-    
+    const [ is_hidden, set_is_hidden] = useState(false)
+
+    // 최초 화면 로딩시 처리
+    useEffect(() => {   
+        FirstLoad()   
+    },[])
+
+    const FirstLoad = () => {
+        getUserInfo().then( res => {
+            updateLoginData(res)
+        })  
+    }
+
     // 로그인 처리( 로그인 중에는 유저데이터 정기적으로 가져옴 )
     let is_login_flg = false
     useEffect(() => {        
@@ -100,28 +111,38 @@ function Header() {
     
     const GetLogInData = async() => {
         const res = await getUserInfo()  
-        // console.log(res.detail) 
-        console.log("ㅁㅁㅁㅁ", res.detail , islogin)  
+        updateLoginData(res)  
+    }  
+
+    const updateLoginData = (res : IuUserInfo) =>{ 
         if(res.detail){
             if(isLogin){
                 setisLogin(false)
-                is_login_flg=false                          
+                is_login_flg=false   
+                navigate("/login")                       
             }
-        } else {        
-            // console.log(res.username , islogin, !islogin)  
-            if(!islogin){     
-                // console.log("내부", islogin)           
+        } else {      
+            if(!islogin){   
                 setisLogin(true)
                 setuserprofile({
                     id: res.id,
                     username: res.username,
-                    authority:res.authority,
+                    authority: res.authority,
+                    login_verified: res.login_verified,
+                    registration_approval: res.registration_approval,
                 })
-            }
+            }          
         }
-        console.log("GetLogInData 처리 :" , res.username , islogin, is_login_flg , userprofile.username)  
-    }
-    
+        console.log("updateLoginData 처리 :" , res , islogin, is_login_flg , userprofile.username) 
+    }  
+    //차단, 승인처리
+    useEffect(()=>{
+        if(!userprofile.login_verified){
+            console.log(userprofile.login_verified)
+        }else if(!userprofile.registration_approval){
+            console.log(userprofile.registration_approval)
+        }
+    },[userprofile])
 
     // 탭 전환 처리
     useEffect(()=>{
@@ -139,31 +160,24 @@ function Header() {
         if(islogin){
             setUserHidden(is_hidden)  
         }
-    },[is_hidden])   
+    },[is_hidden])  
 
 
-    //로그아웃 처리(둘다할필요는 없지만 확실하게 로그아웃해야해서..)
+    // 창을 닫을때 처리
     useEffect(()=>{
-        window.addEventListener('beforeunload', OnLogout);
+        window.addEventListener('unload', Logout);
         return () => {
-            window.removeEventListener('beforeunload', OnLogout)
+            window.removeEventListener('unload', Logout)
         };
-    })
-
-    useEffect(()=>{
-        window.addEventListener('unload', OnLogout);
-        return () => {
-            window.removeEventListener('unload', OnLogout)
-        };
-    })
+    },[])
 
     const OnLogout = async() => {
         if (islogin){
-            const logoutRes = await Logout()
-            console.log(logoutRes) 
+            await Logout()          
             setisLogin(false)  
+            navigate("/login")
         }
-    }    
+    }   
 
     return (
         <Conteiner> 

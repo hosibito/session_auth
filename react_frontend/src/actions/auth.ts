@@ -74,11 +74,13 @@ export interface IuUserInfo{
     login_ip: string;
     login_verified: boolean;
     logout_datetime: string; 
-    is_login: boolean;  
+    is_login: boolean; 
+    registration_approval:boolean; 
+    detail?: string; 
 }
 
 // 일반유저 로그인 유저정보
-export function getUserInfo() {   
+export function getUserInfo(){   
     return fetch('/api/session_auth_v1/users/user').then((response) => response.json())
 }
 

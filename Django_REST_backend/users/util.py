@@ -52,3 +52,21 @@ def cash_get_user(username):
 
 def cash_delete_user(username):
     cache.delete(username)
+
+
+def cash_set_ip(ip, set_data):
+    cache.set(ip, set_data, 2)
+
+
+def cash_get_ip(ip):
+    return cache.get(ip)
+
+
+def avoiding_duplicate_requests(request):
+    client_ip = get_client_ip(request)
+
+    if cash_get_ip(client_ip) == request.data:
+        return True
+    else:
+        cash_set_ip(client_ip, request.data)
+        return False

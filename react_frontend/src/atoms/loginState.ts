@@ -6,10 +6,12 @@ const isLoginValue = atom({
         
 });
 
-interface IuserProfile {
-   id?:number;
-   username?:string;
-   authority?:string;
+export interface IuserProfile {
+    id?:number;
+    username?:string;
+    authority?:string;
+    login_verified?:boolean;
+    registration_approval?:boolean;
 }
 
 export const userProfile = atom<IuserProfile>({
@@ -17,7 +19,9 @@ export const userProfile = atom<IuserProfile>({
     default:{
         id:0,
         username:"",
-        authority:""
+        authority:"",
+        login_verified: false,
+        registration_approval: false,
     }
 })
 
@@ -31,7 +35,9 @@ export const isLogin = selector({
             set(userProfile , {
                 id:0,
                 username:"",
-                authority:""
+                authority:"",
+                login_verified: false,
+                registration_approval: false,
             })
         }
         set(isLoginValue , newValue)

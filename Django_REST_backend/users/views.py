@@ -13,7 +13,7 @@ from rest_framework import permissions
 from rest_framework import status
 
 from .models import User as user_model
-from .serializers import UserSerializer, UserViewSerializer
+from .serializers import UserSerializer, UserMangerViewSerializer
 from .permissions import IsSelf, IsManager
 from .util import (
     get_client_ip,
@@ -21,6 +21,7 @@ from .util import (
     cash_set_user,
     cash_get_user,
     cash_delete_user,
+    avoiding_duplicate_requests,
 )
 
 
@@ -37,7 +38,7 @@ class UsersView(APIView):
 
         users = user_model.objects.filter(login_datetime__gte=today)
 
-        serializer = UserSerializer(users, many=True)
+        serializer = UserMangerViewSerializer(users, many=True)
 
         return Response(serializer.data)
 
@@ -72,6 +73,9 @@ class UserView(APIView):
         """
         { is_hidden }
         """
+        if avoiding_duplicate_requests(request):
+            return Response({"error": "중복요청은 금지됩니다. "})
+
         try:
             is_hidden = request.data.get("is_hidden")
             user_pk = request.user.pk
@@ -109,6 +113,9 @@ class SignupView(APIView):
             "re_password":"rlawldud"
         }
         """
+        if avoiding_duplicate_requests(request):
+            return Response({"error": "중복요청은 금지됩니다. "})
+
         username = request.data.get("username")
         password = request.data.get("password")
         re_password = request.data.get("re_password")
@@ -148,13 +155,16 @@ class LoginView(APIView):
 
     @method_decorator(csrf_protect)
     def post(self, request, format=None):
+        if avoiding_duplicate_requests(request):
+            return Response({"error": "중복요청은 금지됩니다. "})
+
         username = request.data.get("username")
         password = request.data.get("password")
 
         try:
             user = authenticate(username=username, password=password)
             if user is None:
-                return Response({"error": "이디가 없거나, 비번이 잘못되었습니다."})
+                return Response({"error": "아이디가 없거나, 비번이 잘못되었습니다."})
 
             user.login_ip = get_client_ip(request)
             user.login_datetime = timezone.now()

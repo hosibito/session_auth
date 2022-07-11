@@ -98,7 +98,7 @@ function UsersManage() {
                             <span>로그아웃시간</span>
                         </ListTh>
                         { data?.map( (user) => (  
-                            <Lists>
+                            <Lists key={user.id}>
                                 <span>{user.id}</span> 
                                 <span>{user.authority}</span> 
                                 <span>{user.username}</span> 

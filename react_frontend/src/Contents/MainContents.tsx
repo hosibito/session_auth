@@ -1,4 +1,7 @@
+import { useRecoilValue } from "recoil";
 import styled from "styled-components";
+import { IuserProfile, userProfile } from "../atoms/loginState";
+import LoginVerified from "./Users/LoginVerified";
 
 const Conteiner = styled.div`
     width: 100%;  
@@ -10,9 +13,20 @@ const Conteiner = styled.div`
 `;
 
 function MainContents() {
+    const userprofile = useRecoilValue(userProfile)    
+    
     return (
         <Conteiner>
-            <h1>MainContents</h1>
+            {
+                !(userprofile.registration_approval || userprofile.login_verified) ? (
+                    
+                    userprofile.login_verified ? (<LoginVerified/>)  :(<h1>dadsf</h1>)                    
+                                       
+                ):(
+                    
+                    <h1>MainContents</h1>  
+                )
+            }   
         </Conteiner>
     )
 }

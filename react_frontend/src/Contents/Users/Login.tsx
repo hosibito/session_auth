@@ -134,7 +134,16 @@ function Login() {
     const setIsLogin = useSetRecoilState(isLogin)
     const setuserprofile = useSetRecoilState(userProfile)
     const [ loginerrortxt, setloginerrortxt ]= useState("");
+    const [isSubmitClick, setisSubmitClick] = useState(false);
     let navigate = useNavigate()
+
+    // submit 더블클릭 방지  
+    const onClick = (formdata:IloginForm) =>{    
+        if(!isSubmitClick){
+            setisSubmitClick(true)
+            OnValid2(formdata)
+        }    
+    }
     
     // 로그인 REST 처리 방법 1 ( 직접처리)
     const OnValid1 = async(formdata:IloginForm) =>{
@@ -156,7 +165,8 @@ function Login() {
         console.log(result_data)  
             
         if(!result_data.success){          
-            setloginerrortxt(result_data.error as string)           
+            setloginerrortxt(result_data.error as string)  
+            setTimeout( ()=>{setisSubmitClick(false) } , 2000)    
         }else{
             setIsLogin(true)     
     
@@ -173,7 +183,7 @@ function Login() {
             navigate("/")
         }
     }
-
+    
     // 로그인 REST 처리 3 (Login_axios 함수)
     const OnValid3 = async(formdata:IloginForm) =>{
         const res = await Login_axios(formdata)  
@@ -186,7 +196,7 @@ function Login() {
         <Conteiner>
             <LoginConteiner>
                 <Tilte><div>로그인</div></Tilte>
-                <LoginForm onSubmit={handleSubmit(OnValid2)}>
+                <LoginForm onSubmit={handleSubmit(onClick)}>
                     <CSRFToken/>
                 
                     <Formdiv>                    

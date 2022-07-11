@@ -26,10 +26,12 @@ class UserAdmin(UserAdmin):
         "username",
         "email",
         "authority",
+        "registration_approval",
         "login_ip",
         "login_datetime",
         "is_login",
         "is_hidden",
+        "login_verified",
     )
 
 
