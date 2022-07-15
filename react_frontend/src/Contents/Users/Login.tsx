@@ -174,13 +174,15 @@ function Login() {
             const recoil_userprofiledata = {
                 id:userinfo.id,
                 username:userinfo.username,
-                authority:userinfo.authority
+                authority:userinfo.authority,
+                login_verified: userinfo.login_verified,
+                registration_approval: userinfo.registration_approval,
             }
     
             setuserprofile(recoil_userprofiledata)    
             // console.log(res)
-    
-            navigate("/")
+            navigate("/userinfo")
+         
         }
     }
     

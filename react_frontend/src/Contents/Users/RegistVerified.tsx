@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-const LoginVerifiedConteiner = styled.div`
+const RegistVerifiedConteiner = styled.div`
     width: 40%;
     height: 40%;
     border: 2px solid ${prop => prop.theme.bgColor}; 
@@ -32,25 +32,25 @@ const Infolist = styled.div`
     }
 `;
 
-function LoginVerified() { 
+function RegistVerified() { 
     return (               
-        <LoginVerifiedConteiner>
+        <RegistVerifiedConteiner>
             <Tilte>
-                차단된 유저입니다.
+                등록승인중입니다.
             </Tilte>
             <Infolist>
                 <div>        
-                    <span>관리자에 의해 차단되었습니다.</span>   
+                    <span>관리자가 회원가입을 검토중입니다. </span>   
                 </div>   
                 <div>        
-                    <span>이용이 불가능합니다.</span>  
+                    <span>승인후에 사용가능합니다. </span>  
                 </div>   
                 <div>        
-                    <span>총판에 문의해 주세요.</span>  
+                    <span>오래걸릴경우 관리자에게 문의해주세요.</span>  
                 </div>                             
             </Infolist>                 
-        </LoginVerifiedConteiner>   
+        </RegistVerifiedConteiner>   
     )
 }
 
-export default LoginVerified;
+export default RegistVerified;

@@ -1,7 +1,8 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
-import { IuserProfile, userProfile } from "../atoms/loginState";
-import LoginVerified from "./Users/LoginVerified";
+import { userProfile } from "../atoms/loginState";
 
 const Conteiner = styled.div`
     width: 100%;  
@@ -13,22 +14,20 @@ const Conteiner = styled.div`
 `;
 
 function MainContents() {
-    const userprofile = useRecoilValue(userProfile)    
-    
+    const navigate = useNavigate()
+    const userprofile = useRecoilValue(userProfile) 
+
+    useEffect(() => {        
+        if(userprofile.login_verified || !userprofile.registration_approval){
+            navigate("/userinfo") 
+        }
+    }, [])
     return (
         <Conteiner>
-            {
-                !(userprofile.registration_approval || userprofile.login_verified) ? (
-                    
-                    userprofile.login_verified ? (<LoginVerified/>)  :(<h1>dadsf</h1>)                    
-                                       
-                ):(
-                    
-                    <h1>MainContents</h1>  
-                )
-            }   
+        
+            <h1>MainContents</h1>  
+           
         </Conteiner>
     )
 }
-
 export default MainContents;

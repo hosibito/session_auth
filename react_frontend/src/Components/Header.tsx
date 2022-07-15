@@ -4,7 +4,7 @@ import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import { getUserInfo, IuUserInfo, Logout, setUserHidden } from '../actions/auth';
 import useInterval from '../actions/customHook';
-import { isLogin, userProfile } from '../atoms/loginState';
+import { isLogin, IuserProfile, userProfile } from '../atoms/loginState';
 
 
 const Conteiner = styled.div`
@@ -78,7 +78,10 @@ function Header() {
     const [ is_hidden, set_is_hidden] = useState(false)
 
     // 최초 화면 로딩시 처리
-    useEffect(() => {   
+    useEffect(() => {  
+        if(!islogin){
+            Logout()
+        }      
         FirstLoad()   
     },[])
 
@@ -121,28 +124,35 @@ function Header() {
                 is_login_flg=false   
                 navigate("/login")                       
             }
-        } else {      
-            if(!islogin){   
-                setisLogin(true)
-                setuserprofile({
-                    id: res.id,
-                    username: res.username,
-                    authority: res.authority,
-                    login_verified: res.login_verified,
-                    registration_approval: res.registration_approval,
-                })
-            }          
+        } else {    
+            const getUserData : IuserProfile = {
+                id: res.id,
+                username: res.username,
+                authority: res.authority,
+                login_verified: res.login_verified,
+                registration_approval: res.registration_approval,
+            }
+            if (   !(getUserData.id === userprofile.id
+                    && getUserData.username === userprofile.username
+                    && getUserData.authority === userprofile.authority
+                    && getUserData.login_verified === userprofile.login_verified
+                    && getUserData.registration_approval === userprofile.registration_approval)
+                ){
+                    setisLogin(true)
+                    setuserprofile(getUserData)
+            }
         }
         console.log("updateLoginData 처리 :" , res , islogin, is_login_flg , userprofile.username) 
     }  
-    //차단, 승인처리
-    useEffect(()=>{
-        if(!userprofile.login_verified){
-            console.log(userprofile.login_verified)
-        }else if(!userprofile.registration_approval){
-            console.log(userprofile.registration_approval)
-        }
-    },[userprofile])
+
+    // //차단, 승인처리
+    // useEffect(()=>{
+    //     console.log("userprofile 이 변경됨!" , userprofile)
+    //     if(islogin && (userprofile.login_verified || !userprofile.registration_approval)){
+    //         navigate("/userinfo") 
+    //     }        
+    // },[userprofile])
+
 
     // 탭 전환 처리
     useEffect(()=>{

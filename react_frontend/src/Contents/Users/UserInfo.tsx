@@ -1,9 +1,12 @@
+import { useEffect } from "react";
 import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { getUserInfo, IuUserInfo } from "../../actions/auth";
-import { isLogin } from "../../atoms/loginState";
+import { isLogin, userProfile } from "../../atoms/loginState";
+import LoginVerified from "./LoginVerified";
+import RegistVerified from "./RegistVerified";
 
 const Conteiner = styled.div`
     width: 100%;  
@@ -51,67 +54,76 @@ const Infolist = styled.div`
 `;
 
 function UserInfo() { 
+    const navigate = useNavigate()
     const { data, isLoading } = useQuery("user", getUserInfo);   
-    const setislogin = useSetRecoilState(isLogin)
-    
-    let result_data
-    let login_datetime
-    let logout_datetime 
-    
-    if(!isLoading){       
-        if (data?.detail){
-            console.log(data)
-            // {detail: '자격 인증데이터(authentication credentials)가 제공되지 않았습니다.'}
-            // 강제 로그아웃되었을시 나온다. 처리해야함.
-            setislogin(false)    
-             
-            // window.location.reload(); 
-        }
-        else{
-            result_data = data as IuUserInfo
-            login_datetime = (new Date(result_data.login_datetime)).toLocaleString()
-            logout_datetime = (new Date(result_data.logout_datetime)).toLocaleString() 
-        }
-    }
+    const [islogin, setislogin ]  = useRecoilState(isLogin)    
 
+    const userprofile = useRecoilValue(userProfile) 
+
+    useEffect(()=>{
+        if(!islogin){
+            navigate("/login")
+        }
+
+        if(!isLoading){       
+            if (data?.detail){
+                console.log(data)
+                // {detail: '자격 인증데이터(authentication credentials)가 제공되지 않았습니다.'}
+                // 강제 로그아웃되었을시 나온다. 처리해야함.
+                setislogin(false)    
+                 
+                // window.location.reload(); 
+            }         
+        }
+
+    },[userprofile])
+    
+    
+   
 
     return (
         <Conteiner>
-            {isLoading ? ( 
-                <Loding>로딩중!!</Loding>
-            ) : ( 
-                <UserinfoConteiner>
-                    <Tilte>
-                        로그인 유저정보
-                    </Tilte>
-                    <Infolist>
-                        <div>
-                            <span>유저 PK : </span>
-                            <span>{result_data?.id}</span> 
-                        </div>
-                        <div>
-                            <span>유저명 : </span>
-                            <span>{result_data?.username}</span> 
-                        </div>
-                        <div>
-                            <span>등급 : </span>
-                            <span>{result_data?.authority}</span> 
-                        </div>
-                        <div>
-                            <span>로그인 IP : </span>
-                            <span>{result_data?.login_ip}</span> 
-                        </div>   
-                        <div>
-                            <span>로그인 : </span>
-                            <span>{login_datetime}</span> 
-                        </div> 
-                        <div>
-                            <span>로그아웃 : </span>
-                            <span>{logout_datetime}</span> 
-                        </div>                     
-                    </Infolist>                 
-                </UserinfoConteiner>
-            )}
+            {                  
+                userprofile.login_verified ? <LoginVerified/> : (
+                    !userprofile.registration_approval ? <RegistVerified/>  : (
+                        isLoading ? ( 
+                            <Loding>로딩중!!</Loding>
+                        ) : ( 
+                            <UserinfoConteiner>
+                                <Tilte>
+                                    로그인 유저정보
+                                </Tilte>
+                                <Infolist>
+                                    <div>
+                                        <span>유저 PK : </span>
+                                        <span>{data.id}</span> 
+                                    </div>
+                                    <div>
+                                        <span>유저명 : </span>
+                                        <span>{data.username}</span> 
+                                    </div>
+                                    <div>
+                                        <span>등급 : </span>
+                                        <span>{data.authority}</span> 
+                                    </div>
+                                    <div>
+                                        <span>로그인 IP : </span>
+                                        <span>{data.login_ip}</span> 
+                                    </div>   
+                                    <div>
+                                        <span>로그인 : </span>
+                                        <span>{(new Date(data.login_datetime)).toLocaleString()}</span> 
+                                    </div> 
+                                    <div>
+                                        <span>로그아웃 : </span>
+                                        <span>{(new Date(data.logout_datetime)).toLocaleString()}</span> 
+                                    </div>                     
+                                </Infolist>                 
+                            </UserinfoConteiner>
+                        )
+                    )
+                )   
+            }
         </Conteiner>
     )
 }

@@ -12,6 +12,7 @@ class UserAdmin(UserAdmin):
             {
                 "fields": (
                     "authority",
+                    "registration_approval",
                     "login_verified",
                     "login_ip",
                     "login_datetime",
